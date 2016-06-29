@@ -27,3 +27,15 @@ bool Tile::isEndPosition() {
   return strcmp(&content, END) == 0;
 }
 
+
+int Tile::getX() {
+  return this->x;
+}
+
+int Tile::getY() {
+  return this->y;
+}
+
+Tile* Tile::getParent() {
+  return this->parent;
+}

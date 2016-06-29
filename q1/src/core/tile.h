@@ -6,6 +6,9 @@ class Tile {
     bool isStartPosition();
     bool isEndPosition();
     bool isBlocked();//false means it's blocked
+    int getX();
+    int getY();
+    Tile* getParent();
 
     //neighbors
     Tile *left;
