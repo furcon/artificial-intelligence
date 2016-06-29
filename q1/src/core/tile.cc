@@ -39,3 +39,7 @@ int Tile::getY() {
 Tile* Tile::getParent() {
   return this->parent;
 }
+
+char Tile::getContent() {
+  return this->content;
+}

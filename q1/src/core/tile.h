@@ -8,6 +8,8 @@ class Tile {
     bool isBlocked();//false means it's blocked
     int getX();
     int getY();
+    char getContent();
+
     Tile* getParent();
 
     //neighbors
