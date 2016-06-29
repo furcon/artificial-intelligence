@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iostream>
 
+#include "../core/tile.h"
+
 using namespace std;
 int main(int argc, char** argv) {
     if(argc != 2) {
@@ -16,7 +18,9 @@ int main(int argc, char** argv) {
     std::ifstream infile(fname);
     std::string line;
 
-    char map[25][25];
+
+    Tile *map[25][25];
+
     int row = 24;
     while (std::getline(infile, line)) { //will run 25 times
         char* characters = (char *)line.c_str();
@@ -25,19 +29,21 @@ int main(int argc, char** argv) {
                 cout << "Error: invalid file" << endl;
                 exit(-1);
             } else {
-                map[row][col] = characters[col];
+                map[row][col] = new Tile(row,col, characters[col]);
+                if(map[row][col]->isBlocked()) {
+                  cout << "yay " << endl;
+                }
             }
         }
         row--;
     }
 
-    for (int i = 0; i < 25; i++) {
-        for (int j = 0; j < 25; j++) {
-            cout << map[i][j];
-        }
-        cout << endl;
-    }
 
+    for (int i = 0; i < 25; i++) {
+      for (int j = 0; j < 25; j++) {
+        delete map[i][j];
+      }
+    }
     exit(0);
 }
 

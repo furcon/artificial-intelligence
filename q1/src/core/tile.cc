@@ -6,7 +6,7 @@ using namespace std;
 #define START "S"
 #define END "E"
 
-Tile::Tile(int x, int y, char *content) {
+Tile::Tile(int x, int y, char content) {
   this->x = x;
   this->y = y;
   this->content = content;
@@ -16,14 +16,14 @@ Tile::Tile(int x, int y, char *content) {
 
 
 bool Tile::isBlocked() {
-  return strcmp(content, BLOCKED) == 0;
+  return strcmp(&content, BLOCKED) == 0;
 }
 
 bool Tile::isStartPosition() {
-  return strcmp(content, START) == 0;
+  return strcmp(&content, START) == 0;
 }
 
 bool Tile::isEndPosition() {
-  return strcmp(content, END) == 0;
+  return strcmp(&content, END) == 0;
 }
 

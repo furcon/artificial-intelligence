@@ -2,7 +2,7 @@
 #define TILE_H
 class Tile {
   public:
-    Tile(int x, int y, char *entry);
+    Tile(int x, int y, char entry);
     bool isStartPosition();
     bool isEndPosition();
     bool isBlocked();//false means it's blocked
@@ -18,6 +18,6 @@ class Tile {
   private:
     int x;
     int y;
-    char *content;
+    char content;
 };
 #endif
