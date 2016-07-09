@@ -90,13 +90,20 @@ public class q1 {
         Vector<Tile> path = new Vector<Tile>(25);
         path.addElement(last);
         Tile current = last;
+        int cost = 1;
         while(current.parent() != null) {
             path.addElement(current.parent());
             current = current.parent();
+            cost++;
         }
+        System.out.println("Cost: " + cost);
         for (int i = path.size()-1; i >= 0; i--) {
-            System.out.println(path.get(i).x() + ", " + path.get(i).y());
+            if (i != path.size()-1) {
+                System.out.print(", ");
+            }
+            System.out.print("[" + path.get(i).x() + ", " + path.get(i).y() + "]");
         }
+        System.out.println();
     }
 
     public static LinkedList<Tile> getChildren (Tile parent, Tile[][] map) {
@@ -104,49 +111,56 @@ public class q1 {
         int x = parent.x();
         int y = parent.y();
 
-        //Top x - 1
-        if (x - 1 < 25 && x - 1 > -1) {
-            if(map[x - 1][y] != parent.parent() && 
-                    !map[x - 1][y].visited() && !map[x - 1][y].isBlocked()) {
-                map[x - 1][y].setParent(parent);
-                children.add(map[x-1][y]);
-            }
-        }
         //Bottom x + 1
         if (x + 1 < 25 && x + 1 > -1) {
-            if(map[x + 1][y] != parent.parent() && 
-                    !map[x + 1][y].visited() && !map[x + 1][y].isBlocked()) {
+            if (parent.parent() != null && (x + 1) == parent.parent().x() && y == parent.parent().y()) {
+                //do nothing
+            } else if(!map[x + 1][y].visited() && !map[x + 1][y].isBlocked()) {
                 map[x + 1][y].setParent(parent); 
                 children.add(map[x + 1][y]);
             }
         } 
-        //Left y - 1
-        if (y - 1 < 25 && y - 1 > -1) {
-            if(map[x][y - 1] != parent.parent() && 
-                    !map[x][y - 1].visited() && !map[x][y - 1].isBlocked()) {
-                map[x][y - 1].setParent(parent); 
-                children.add(map[x][y - 1]);
-            }
-        } 
         //Right y + 1
         if (y + 1 < 25 && y + 1 > -1) {
-            if(map[x][y + 1] != parent.parent() && 
-                    !map[x][y + 1].visited() && !map[x][y + 1].isBlocked()) {
+            if (parent.parent() != null && x == parent.parent().x() && (y + 1) == parent.parent().y()) {
+                //do nothing
+            } else if(!map[x][y + 1].visited() && !map[x][y + 1].isBlocked()) {
                 map[x][y + 1].setParent(parent); 
                 children.add(map[x][y + 1]);
             }
         }
-
+        //Top x - 1
+        if (x - 1 < 25 && x - 1 > -1) {
+            if (parent.parent() != null && (x-1) == parent.parent().x() && y == parent.parent().y()) {
+                //do nothing
+            } else if(!map[x - 1][y].visited() && !map[x - 1][y].isBlocked()) {
+                map[x - 1][y].setParent(parent);
+                children.add(map[x-1][y]);
+            }
+        }
+        //Left y - 1
+        if (y - 1 < 25 && y - 1 > -1) {
+            if (parent.parent() != null && x == parent.parent().x() && (y-1) == parent.parent().y()) {
+                //do nothing
+            } else if(!map[x][y - 1].visited() && !map[x][y - 1].isBlocked()) {
+                map[x][y - 1].setParent(parent); 
+                children.add(map[x][y - 1]);
+            }
+        }
         return children;
     }
 
     public static void BFS(Tile start, Tile map[][]) {
         LinkedList<Tile> openQueue = new LinkedList<Tile>(); 
         openQueue.add(start);
+        start.setCost(0);
         start.setVisited(true);
+        int numExplored = 0;
         while(!openQueue.isEmpty()) {
             Tile next = (Tile)openQueue.remove();
+            numExplored++;
             if (next.isEndPosition()) {
+                System.out.println("Nodes Explored: " + numExplored);
                 printPath(next, map);
                 openQueue.clear();
             } else {
@@ -162,14 +176,19 @@ public class q1 {
         }
     }
 
-    public static void DFS(Tile current, Tile map[][]) {
+    public static void DFS(Tile current, Tile map[][], int numExplored) {
         if (current.isEndPosition()) {
+            System.out.println("Nodes Explored: " + numExplored);
             printPath(current, map);
         } else {
             LinkedList<Tile> children = getChildren(current, map);
             while(!children.isEmpty()) {
                 Tile child = (Tile)children.remove();
-                DFS(child, map);
+                if (!child.visited()) {
+                    numExplored = numExplored + 1;
+                    child.setVisited(true);
+                    DFS(child, map, numExplored);
+                }
             }
         }
     }
@@ -181,11 +200,13 @@ public class q1 {
         PriorityQueue<Tile> openQueue = new PriorityQueue<Tile>(25, c); 
         start.setCost(0);
         openQueue.add(start);
+        int numExplored = 0;
         while(!openQueue.isEmpty()) {
             Tile next = (Tile)openQueue.remove();
             next.setVisited(true);
-
+            numExplored++;
             if (next.isEndPosition()) {
+                System.out.println("Nodes Explored: " + numExplored);
                 printPath(next, map);
                 openQueue.clear();
             } else {
@@ -215,11 +236,16 @@ public class q1 {
     }
 
     public static void main(String[] args) {
+        if (args.length < 2) {
+            System.out.println("Usage: java q1 <BFS/DFS/AStar> <*.txt>");
+            return;
+        }
+
         Tile map[][] = new Tile[25][25];
         Tile start = null;
         Tile end = null;
         try {
-            File file = new File(args[0]);
+            File file = new File(args[1]);
             Scanner scanner = new Scanner(file);
             int row = 24;
             while (scanner.hasNextLine()) {
@@ -245,10 +271,22 @@ public class q1 {
             start = map[0][0];
         }
 
-        //DFS(start, map);
-        BFS(start, map);
-        //generateHeuristics(end, map);
-        //AStar(start, map);
+        switch(args[0]) {
+            case "DFS":
+                start.setCost(0);
+                DFS(start, map, 1);
+                break;
+            case "BFS":
+                start.setCost(0);
+                BFS(start, map);
+                break;
+            case "AStar":
+                generateHeuristics(end, map);
+                AStar(start, map);
+                break;
+            default:
+                System.out.println("Error: Invalid search name");
+        }     
     }
 }
 
